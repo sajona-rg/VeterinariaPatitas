@@ -1,0 +1,99 @@
+@model Mascota
+@{
+    var esEdicion = Model.Id > 0;
+    var especieId = ViewBag.EspecieId as int?;
+    var tieneFoto = !string.IsNullOrEmpty(Model.RutaFoto);
+}
+
+<div class="panel">
+    <div class="panel-body">
+        <div asp-validation-summary="ModelOnly" class="mb-3"></div>
+
+        <div class="row g-4">
+            <!-- Foto -->
+            <div class="col-md-5 col-lg-4">
+                <p class="form-seccion">Foto</p>
+                <label class="carga-foto @(tieneFoto ? "con-foto" : "")" data-carga-foto data-quitar="#quitarFoto">
+                    <img src="@(tieneFoto ? Model.RutaFoto : null)" alt="Vista previa de la foto" hidden="@(!tieneFoto)" />
+                    <span class="indicacion">
+                        <i class="bi bi-camera"></i>
+                        <strong>@(tieneFoto ? "Cambiar foto" : "Subir foto")</strong>
+                        <small>Haz clic o arrastra una imagen<br />JPG, PNG, WEBP o GIF · máx. 5 MB</small>
+                    </span>
+                    <input type="file" name="foto" accept=".jpg,.jpeg,.png,.webp,.gif,image/*" aria-label="Foto de la mascota" />
+                </label>
+                @Html.ValidationMessage("foto", new { @class = "text-danger d-block mt-2" })
+                @if (esEdicion && tieneFoto)
+                {
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" name="quitarFoto" value="true" id="quitarFoto" />
+                        <label class="form-check-label small" for="quitarFoto">Quitar la foto actual</label>
+                    </div>
+                }
+            </div>
+
+            <div class="col-md-7 col-lg-8">
+                <p class="form-seccion">Identificación</p>
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <label asp-for="Nombre" class="form-label requerido"></label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej. Lupe" autofocus="@(!esEdicion)" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="IdPropietario" class="form-label requerido"></label>
+                        <select asp-for="IdPropietario" class="form-select" asp-items="ViewBag.Propietarios">
+                            <option value="">Elige el propietario</option>
+                        </select>
+                        <span asp-validation-for="IdPropietario" class="text-danger"></span>
+                        <div class="form-text">¿No aparece? <a asp-controller="Propietarios" asp-action="Nuevo">Regístralo primero</a>.</div>
+                    </div>
+                </div>
+
+                <p class="form-seccion">Especie y raza</p>
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <label for="especie" class="form-label requerido">Especie</label>
+                        <select id="especie" class="form-select" asp-items="ViewBag.Especies"
+                                data-razas-destino="#IdRaza"
+                                data-razas-url="@Url.Action("RazasDeEspecie", "Mascotas")"
+                                data-razas-vacio="Elige la raza">
+                            <option value="">Elige la especie</option>
+                        </select>
+                        <div class="form-text">Al elegirla se cargan solo sus razas.</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="IdRaza" class="form-label requerido"></label>
+                        <select asp-for="IdRaza" class="form-select" asp-items="ViewBag.Razas" data-sin-especie="Primero elige la especie">
+                            <option value="">@(especieId is null ? "Primero elige la especie" : "Elige la raza")</option>
+                        </select>
+                        <span asp-validation-for="IdRaza" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <p class="form-seccion">Datos físicos</p>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label asp-for="FechaNacimiento" class="form-label"></label>
+                        <input asp-for="FechaNacimiento" class="form-control" max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="Peso" class="form-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Peso" type="number" step="0.01" min="0.01" max="999.99" class="form-control" placeholder="0.00" />
+                            <span class="input-group-text">kg</span>
+                        </div>
+                        <span asp-validation-for="Peso" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-acciones">
+        <a asp-action="@(esEdicion ? "Ficha" : "Index")" asp-route-id="@(esEdicion ? (int?)Model.Id : null)" class="btn btn-soft">Cancelar</a>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check2"></i> @(esEdicion ? "Guardar cambios" : "Registrar mascota")
+        </button>
+    </div>
+</div>

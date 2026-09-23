@@ -1,0 +1,101 @@
+@model IEnumerable<Propietario>
+@{
+    ViewData["Title"] = "Propietarios";
+    ViewData["Miga"] = "Registro clínico";
+    ViewData["Subtitulo"] = "Personas responsables de los pacientes de la clínica.";
+    var texto = ViewData["Texto"] as string;
+    var total = Model.Count();
+}
+
+@section Acciones {
+    <a class="btn btn-primary" asp-action="Nuevo"><i class="bi bi-person-plus"></i> Nuevo propietario</a>
+}
+
+<form asp-action="Index" method="get" class="panel filtros" role="search">
+    <div class="row g-2 align-items-end">
+        <div class="col">
+            <label class="form-label" for="texto">Buscar</label>
+            <div class="buscador">
+                <i class="bi bi-search"></i>
+                <input id="texto" name="texto" value="@texto" type="search" class="form-control" autocomplete="off"
+                       placeholder="Nombre, apellido, correo o teléfono…" />
+            </div>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </div>
+    </div>
+</form>
+
+<div class="resumen-filtros">
+    <span><strong>@total</strong> @(total == 1 ? "propietario" : "propietarios")@(string.IsNullOrWhiteSpace(texto) ? "" : $" para «{texto}»")</span>
+    @if (!string.IsNullOrWhiteSpace(texto))
+    {
+        <a asp-action="Index" class="btn btn-soft btn-sm"><i class="bi bi-x-lg"></i> Limpiar búsqueda</a>
+    }
+</div>
+
+<div class="panel">
+    @if (total == 0)
+    {
+        <div class="vacio">
+            <div class="icono"><i class="bi bi-people"></i></div>
+            @if (string.IsNullOrWhiteSpace(texto))
+            {
+                <h3>No hay propietarios todavía</h3>
+                <p>Registra al primer propietario para poder asociarle mascotas.</p>
+                <a asp-action="Nuevo" class="btn btn-primary"><i class="bi bi-person-plus"></i> Nuevo propietario</a>
+            }
+            else
+            {
+                <h3>Sin resultados</h3>
+                <p>No encontramos propietarios que coincidan con «@texto».</p>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table tabla table-hover">
+                <thead>
+                    <tr>
+                        <th>Propietario</th>
+                        <th>Contacto</th>
+                        <th class="d-none d-lg-table-cell">Dirección</th>
+                        <th class="text-center">Mascotas</th>
+                        <th class="text-end"><span class="visually-hidden">Acciones</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="persona">
+                                    <span class="avatar">@p.Iniciales</span>
+                                    <a asp-action="Ficha" asp-route-id="@p.Id">@p.Apellido, @p.Nombre</a>
+                                </div>
+                            </td>
+                            <td class="contacto">
+                                @if (!string.IsNullOrEmpty(p.Telefono)) { <div><i class="bi bi-telephone"></i>@p.Telefono</div> }
+                                @if (!string.IsNullOrEmpty(p.Email)) { <div><i class="bi bi-envelope"></i>@p.Email</div> }
+                                @if (string.IsNullOrEmpty(p.Telefono) && string.IsNullOrEmpty(p.Email)) { <span class="text-secondary">—</span> }
+                            </td>
+                            <td class="d-none d-lg-table-cell text-secondary small">@(string.IsNullOrEmpty(p.Direccion) ? "—" : p.Direccion)</td>
+                            <td class="text-center">
+                                <span class="chip @(p.Mascotas.Count > 0 ? "chip-contador" : "chip-cero")">
+                                    <i class="bi bi-heart"></i> @p.Mascotas.Count
+                                </span>
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a class="icon-btn" asp-action="Ficha" asp-route-id="@p.Id" title="Ver ficha" aria-label="Ver ficha de @p.NombreCompleto"><i class="bi bi-eye"></i></a>
+                                <a class="icon-btn" asp-action="Editar" asp-route-id="@p.Id" title="Editar" aria-label="Editar a @p.NombreCompleto"><i class="bi bi-pencil"></i></a>
+                                <a class="icon-btn danger" asp-action="Eliminar" asp-route-id="@p.Id" title="Eliminar" aria-label="Eliminar a @p.NombreCompleto"><i class="bi bi-trash3"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

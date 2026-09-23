@@ -1,0 +1,18 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Algo salió mal";
+    ViewData["Subtitulo"] = "No pudimos completar la solicitud.";
+}
+
+<div class="panel">
+    <div class="vacio">
+        <div class="icono" style="background:var(--pt-rojo-suave);color:var(--pt-rojo)"><i class="bi bi-bandaid"></i></div>
+        <h3>Ocurrió un error inesperado</h3>
+        <p>Intenta de nuevo en un momento. Si el problema continúa, comparte el código de la solicitud con soporte.</p>
+        @if (Model.ShowRequestId)
+        {
+            <p><code>@Model.RequestId</code></p>
+        }
+        <a class="btn btn-primary" asp-controller="Tablero" asp-action="Index"><i class="bi bi-house"></i> Volver al tablero</a>
+    </div>
+</div>

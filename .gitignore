@@ -1,0 +1,8 @@
+bin/
+obj/
+.vs/
+*.user
+
+# Fotos subidas en tiempo de ejecución (se versiona solo la carpeta)
+wwwroot/images/*
+!wwwroot/images/.gitkeep

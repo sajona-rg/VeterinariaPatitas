@@ -1,0 +1,58 @@
+@model Propietario
+@{
+    var esEdicion = Model.Id > 0;
+}
+
+<div class="panel">
+    <div class="panel-body">
+        <div asp-validation-summary="ModelOnly" class="mb-3"></div>
+
+        <p class="form-seccion">Datos personales</p>
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6">
+                <label asp-for="Nombre" class="form-label requerido"></label>
+                <input asp-for="Nombre" class="form-control" placeholder="Ej. Laura" autofocus="@(!esEdicion)" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="col-sm-6">
+                <label asp-for="Apellido" class="form-label requerido"></label>
+                <input asp-for="Apellido" class="form-control" placeholder="Ej. Restrepo" />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
+        </div>
+
+        <p class="form-seccion">Contacto</p>
+        <div class="row g-3">
+            <div class="col-sm-6">
+                <label asp-for="Telefono" class="form-label"></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                    <input asp-for="Telefono" class="form-control" placeholder="300 000 0000" />
+                </div>
+                <span asp-validation-for="Telefono" class="text-danger"></span>
+            </div>
+            <div class="col-sm-6">
+                <label asp-for="Email" class="form-label"></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input asp-for="Email" class="form-control" placeholder="nombre@correo.com" />
+                </div>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Direccion" class="form-label"></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                    <input asp-for="Direccion" class="form-control" placeholder="Calle, número y municipio" />
+                </div>
+                <span asp-validation-for="Direccion" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="form-acciones">
+        <a asp-action="@(esEdicion ? "Ficha" : "Index")" asp-route-id="@(esEdicion ? (int?)Model.Id : null)" class="btn btn-soft">Cancelar</a>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check2"></i> @(esEdicion ? "Guardar cambios" : "Registrar propietario")
+        </button>
+    </div>
+</div>

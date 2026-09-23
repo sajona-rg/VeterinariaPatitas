@@ -1,0 +1,65 @@
+@model Propietario
+@{
+    ViewData["Title"] = Model.NombreCompleto;
+    ViewData["Miga"] = "Ficha del propietario";
+    var mascotas = Model.Mascotas.OrderBy(m => m.Nombre).ToList();
+}
+
+@section Acciones {
+    <a class="btn btn-soft" asp-action="Index"><i class="bi bi-arrow-left"></i> Propietarios</a>
+    <a class="btn btn-ghost-danger" asp-action="Eliminar" asp-route-id="@Model.Id"><i class="bi bi-trash3"></i> Eliminar</a>
+    <a class="btn btn-primary" asp-action="Editar" asp-route-id="@Model.Id"><i class="bi bi-pencil"></i> Editar</a>
+}
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="panel">
+            <div class="panel-body text-center">
+                <span class="avatar avatar-lg mb-3">@Model.Iniciales</span>
+                <h2 class="h5 mb-1">@Model.NombreCompleto</h2>
+                <p class="text-secondary small mb-3">Propietario #@Model.Id.ToString("D4")</p>
+                <ul class="contacto-lista text-start">
+                    <li><i class="bi bi-telephone"></i> @(string.IsNullOrEmpty(Model.Telefono) ? "Sin teléfono" : Model.Telefono)</li>
+                    <li><i class="bi bi-envelope"></i>
+                        @if (string.IsNullOrEmpty(Model.Email)) { <span>Sin correo</span> } else { <a href="mailto:@Model.Email">@Model.Email</a> }
+                    </li>
+                    <li><i class="bi bi-geo-alt"></i> @(string.IsNullOrEmpty(Model.Direccion) ? "Sin dirección" : Model.Direccion)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2>Mascotas a su cargo</h2>
+                    <span class="sub">@mascotas.Count @(mascotas.Count == 1 ? "paciente" : "pacientes")</span>
+                </div>
+                <a class="btn btn-accent btn-sm" asp-controller="Mascotas" asp-action="Nuevo" asp-route-propietarioId="@Model.Id">
+                    <i class="bi bi-plus-lg"></i> Agregar mascota
+                </a>
+            </div>
+            @if (mascotas.Count == 0)
+            {
+                <div class="vacio">
+                    <div class="icono"><i class="bi bi-heart"></i></div>
+                    <h3>Sin mascotas registradas</h3>
+                    <p>Agrega la primera mascota de @Model.Nombre; quedará asociada automáticamente.</p>
+                </div>
+            }
+            @foreach (var m in mascotas)
+            {
+                <a class="lista-fila" asp-controller="Mascotas" asp-action="Ficha" asp-route-id="@m.Id">
+                    <div class="foto foto-xs"><partial name="_FotoMascota" model="m" /></div>
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="titulo">@m.Nombre</div>
+                        <div class="meta">@m.Raza?.Nombre@(m.Edad is null ? "" : $" · {m.Edad}")</div>
+                    </div>
+                    <span class="chip chip-especie-@((m.Raza?.IdEspecie ?? 0) % 5)">@m.Raza?.Especie?.Nombre</span>
+                    <i class="bi bi-chevron-right text-secondary"></i>
+                </a>
+            }
+        </div>
+    </div>
+</div>

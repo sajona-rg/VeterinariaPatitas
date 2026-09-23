@@ -1,0 +1,119 @@
+@model MascotasListadoViewModel
+@{
+    ViewData["Title"] = "Pacientes";
+    ViewData["Miga"] = "Registro clínico";
+    ViewData["Subtitulo"] = "Busca por nombre, dueño, especie o raza y combina los filtros.";
+    var total = Model.Resultados.Count;
+}
+
+@section Acciones {
+    <a class="btn btn-primary" asp-action="Nuevo"><i class="bi bi-plus-lg"></i> Nueva mascota</a>
+}
+
+<form asp-action="Index" method="get" class="panel filtros" role="search">
+    <div class="row g-3 align-items-end">
+        <div class="col-12 col-lg-4">
+            <label class="form-label" for="texto">Buscar</label>
+            <div class="buscador">
+                <i class="bi bi-search"></i>
+                <input id="texto" name="texto" value="@Model.Texto" class="form-control" type="search"
+                       placeholder="Nombre, dueño, especie o raza…" autocomplete="off" />
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <label class="form-label" for="especieId">Especie</label>
+            <select id="especieId" name="especieId" class="form-select" asp-items="Model.Especies"
+                    data-razas-destino="#razaId"
+                    data-razas-url="@Url.Action("RazasDeEspecie")"
+                    data-razas-vacio="Todas">
+                <option value="">Todas</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <label class="form-label" for="razaId">Raza</label>
+            <select id="razaId" name="razaId" class="form-select" asp-items="Model.Razas" data-envio-auto>
+                <option value="">Todas</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <label class="form-label" for="propietarioId">Propietario</label>
+            <select id="propietarioId" name="propietarioId" class="form-select" asp-items="Model.Propietarios" data-envio-auto>
+                <option value="">Todos</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <label class="form-label" for="orden">Ordenar por</label>
+            <select id="orden" name="orden" class="form-select" data-envio-auto>
+                <option value="nombre" selected="@(Model.Orden is null or "nombre")">Nombre (A–Z)</option>
+                <option value="recientes" selected="@(Model.Orden == "recientes")">Más recientes</option>
+                <option value="edad" selected="@(Model.Orden == "edad")">Mayor edad</option>
+                <option value="peso" selected="@(Model.Orden == "peso")">Mayor peso</option>
+            </select>
+        </div>
+    </div>
+    <button type="submit" class="visually-hidden">Buscar</button>
+</form>
+
+<div class="resumen-filtros">
+    <span>
+        <strong>@total</strong> @(total == 1 ? "paciente encontrado" : "pacientes encontrados")
+        @if (Model.HayFiltros) { <text>con los filtros aplicados</text> }
+    </span>
+    @if (Model.HayFiltros)
+    {
+        <a asp-action="Index" class="btn btn-soft btn-sm"><i class="bi bi-x-lg"></i> Quitar filtros</a>
+    }
+</div>
+
+@if (total == 0)
+{
+    <div class="panel vacio">
+        <div class="icono"><i class="bi bi-search-heart"></i></div>
+        @if (Model.HayFiltros)
+        {
+            <h3>Sin coincidencias</h3>
+            <p>Ninguna mascota cumple con esos filtros. Prueba con otra búsqueda o quítalos.</p>
+            <a asp-action="Index" class="btn btn-soft">Quitar filtros</a>
+        }
+        else
+        {
+            <h3>Aún no hay pacientes</h3>
+            <p>Registra la primera mascota para empezar a construir el historial de la clínica.</p>
+            <a asp-action="Nuevo" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Registrar mascota</a>
+        }
+    </div>
+}
+else
+{
+    <div class="row g-3 g-xl-4 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4">
+        @foreach (var m in Model.Resultados)
+        {
+            <div class="col">
+                <article class="panel tarjeta-mascota">
+                    <div class="foto">
+                        <partial name="_FotoMascota" model="m" />
+                        <span class="chip chip-flotante chip-especie-@((m.Raza?.IdEspecie ?? 0) % 5)">@m.Raza?.Especie?.Nombre</span>
+                    </div>
+                    <div class="cuerpo">
+                        <h2 class="nombre"><a asp-action="Ficha" asp-route-id="@m.Id">@m.Nombre</a></h2>
+                        <div class="raza">@m.Raza?.Nombre</div>
+                        <div class="datos">
+                            <span><i class="bi bi-cake2"></i> @(m.Edad ?? "Edad s/d")</span>
+                            <span><i class="bi bi-speedometer2"></i> @(m.Peso is null ? "Peso s/d" : $"{m.Peso:0.##} kg")</span>
+                        </div>
+                    </div>
+                    <div class="pie">
+                        <a class="dueno text-reset text-decoration-none" asp-controller="Propietarios" asp-action="Ficha" asp-route-id="@m.IdPropietario" title="Ver propietario">
+                            <span class="avatar">@m.Propietario?.Iniciales</span>
+                            <span>@m.Propietario?.NombreCompleto</span>
+                        </a>
+                        <div class="d-flex">
+                            <a class="icon-btn" asp-action="Editar" asp-route-id="@m.Id" title="Editar" aria-label="Editar @m.Nombre"><i class="bi bi-pencil"></i></a>
+                            <a class="icon-btn danger" asp-action="Eliminar" asp-route-id="@m.Id" title="Eliminar" aria-label="Eliminar @m.Nombre"><i class="bi bi-trash3"></i></a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,48 @@
+@model Propietario
+@{
+    ViewData["Title"] = "Eliminar propietario";
+    ViewData["Miga"] = "Propietarios";
+    var bloqueado = Model.Mascotas.Count > 0;
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+        <form asp-action="Eliminar" asp-route-id="@Model.Id" method="post" class="panel zona-peligro">
+            <div class="panel-head">
+                <h2><i class="bi bi-exclamation-triangle me-1"></i> Esta acción no se puede deshacer</h2>
+            </div>
+            <div class="panel-body">
+                <div class="d-flex gap-3 align-items-center mb-3">
+                    <span class="avatar avatar-lg">@Model.Iniciales</span>
+                    <div>
+                        <div class="fw-bold fs-5" style="color:var(--pt-bosque)">@Model.NombreCompleto</div>
+                        <div class="text-secondary small">@Model.Telefono @(string.IsNullOrEmpty(Model.Email) ? "" : "· " + Model.Email)</div>
+                    </div>
+                </div>
+
+                @if (bloqueado)
+                {
+                    <div class="aviso-bloqueo">
+                        <i class="bi bi-shield-lock fs-5"></i>
+                        <div>
+                            <strong>No se puede eliminar todavía.</strong><br />
+                            Tiene @Model.Mascotas.Count mascota(s) a su nombre. Reasígnalas a otro propietario o elimínalas primero.
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p class="mb-0">Se borrará el registro de <strong>@Model.NombreCompleto</strong>. No tiene mascotas asociadas.</p>
+                }
+            </div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-acciones">
+                <a asp-action="Ficha" asp-route-id="@Model.Id" class="btn btn-soft">@(bloqueado ? "Volver a la ficha" : "No, conservar")</a>
+                @if (!bloqueado)
+                {
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash3"></i> Sí, eliminar</button>
+                }
+            </div>
+        </form>
+    </div>
+</div>

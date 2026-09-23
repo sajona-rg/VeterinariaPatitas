@@ -1,0 +1,19 @@
+@model Propietario
+@{
+    ViewData["Title"] = "Editar propietario";
+    ViewData["Miga"] = "Propietarios";
+    ViewData["Subtitulo"] = "Actualiza los datos personales y de contacto.";
+}
+
+<div class="row">
+    <div class="col-xl-9">
+        <form asp-action="Editar" asp-route-id="@Model.Id" method="post" novalidate>
+            <input type="hidden" asp-for="Id" />
+            <partial name="_FormPropietario" model="Model" />
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

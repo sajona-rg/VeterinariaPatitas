@@ -1,0 +1,31 @@
+@model Mascota
+@{
+    ViewData["Title"] = "Eliminar mascota";
+    ViewData["Miga"] = "Pacientes";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+        <form asp-action="Eliminar" asp-route-id="@Model.Id" method="post" class="panel zona-peligro">
+            <div class="panel-head">
+                <h2><i class="bi bi-exclamation-triangle me-1"></i> Esta acción no se puede deshacer</h2>
+            </div>
+            <div class="panel-body">
+                <div class="d-flex gap-3 align-items-center mb-3">
+                    <div class="foto foto-xs" style="width:72px;height:72px;border-radius:16px"><partial name="_FotoMascota" model="Model" /></div>
+                    <div>
+                        <div class="fw-bold fs-5" style="color:var(--pt-bosque)">@Model.Nombre</div>
+                        <div class="text-secondary">@Model.Raza?.Especie?.Nombre · @Model.Raza?.Nombre</div>
+                        <div class="text-secondary small">Propietario: @Model.Propietario?.NombreCompleto</div>
+                    </div>
+                </div>
+                <p class="mb-0">Se borrará la ficha de <strong>@Model.Nombre</strong> y su foto del servidor.</p>
+            </div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-acciones">
+                <a asp-action="Ficha" asp-route-id="@Model.Id" class="btn btn-soft">No, conservar</a>
+                <button type="submit" class="btn btn-danger"><i class="bi bi-trash3"></i> Sí, eliminar</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,111 @@
+@model TableroViewModel
+@{
+    ViewData["Title"] = "Tablero";
+    ViewData["Miga"] = "Resumen";
+    ViewData["Subtitulo"] = "Así va el registro de pacientes y propietarios de la clínica.";
+    var maximo = Model.PorEspecie.Count > 0 ? Math.Max(1, Model.PorEspecie.Max(e => e.Cantidad)) : 1;
+}
+
+@section Acciones {
+    <a class="btn btn-soft" asp-controller="Propietarios" asp-action="Nuevo"><i class="bi bi-person-plus"></i> Nuevo propietario</a>
+    <a class="btn btn-primary" asp-controller="Mascotas" asp-action="Nuevo"><i class="bi bi-plus-lg"></i> Nueva mascota</a>
+}
+
+<section class="hero mb-4">
+    <svg class="hero-deco" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><ellipse cx="6" cy="9.5" rx="2.1" ry="2.7"/><ellipse cx="10" cy="5.6" rx="2.1" ry="2.8"/><ellipse cx="14" cy="5.6" rx="2.1" ry="2.8"/><ellipse cx="18" cy="9.5" rx="2.1" ry="2.7"/><path d="M12 11.2c-3 0-6 3.4-6 6.1 0 1.8 1.4 2.7 3 2.7 1.3 0 2-.6 3-.6s1.7.6 3 .6c1.6 0 3-.9 3-2.7 0-2.7-3-6.1-6-6.1Z"/></svg>
+    <h2 class="mb-2">Cada paciente, con su historia a la mano</h2>
+    <p class="mb-3">Registra propietarios, asocia sus mascotas con foto, especie y raza, y encuéntralas en segundos con los filtros.</p>
+    <a class="btn btn-accent" asp-controller="Mascotas" asp-action="Index">Ver pacientes <i class="bi bi-arrow-right"></i></a>
+</section>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <a class="panel kpi d-block text-decoration-none h-100" asp-controller="Mascotas" asp-action="Index">
+            <div class="kpi-icon tono-menta"><i class="bi bi-heart-pulse"></i></div>
+            <div class="kpi-valor">@Model.TotalMascotas</div>
+            <div class="kpi-label">Mascotas registradas</div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <a class="panel kpi d-block text-decoration-none h-100" asp-controller="Propietarios" asp-action="Index">
+            <div class="kpi-icon tono-durazno"><i class="bi bi-people"></i></div>
+            <div class="kpi-valor">@Model.TotalPropietarios</div>
+            <div class="kpi-label">Propietarios</div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="panel kpi h-100">
+            <div class="kpi-icon tono-lila"><i class="bi bi-diagram-3"></i></div>
+            <div class="kpi-valor">@Model.TotalEspecies</div>
+            <div class="kpi-label">Especies en catálogo</div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="panel kpi h-100">
+            <div class="kpi-icon tono-cielo"><i class="bi bi-tags"></i></div>
+            <div class="kpi-valor">@Model.TotalRazas</div>
+            <div class="kpi-label">Razas en catálogo</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="panel h-100">
+            <div class="panel-head">
+                <div>
+                    <h2>Pacientes por especie</h2>
+                    <span class="sub">Mascota → Raza → Especie</span>
+                </div>
+            </div>
+            <div class="panel-body">
+                @if (Model.PorEspecie.Count == 0)
+                {
+                    <p class="text-secondary mb-0">Aún no hay especies en el catálogo.</p>
+                }
+                @foreach (var e in Model.PorEspecie)
+                {
+                    var ancho = (int)Math.Round(e.Cantidad * 100.0 / maximo);
+                    <div class="dist-item">
+                        <div class="dist-top"><span>@e.Especie</span><strong>@e.Cantidad</strong></div>
+                        <div class="dist-bar" role="progressbar" aria-label="@e.Especie" aria-valuenow="@e.Cantidad" aria-valuemin="0" aria-valuemax="@maximo">
+                            <span style="width:@(ancho)%"></span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="panel h-100">
+            <div class="panel-head">
+                <div>
+                    <h2>Últimos ingresos</h2>
+                    <span class="sub">Las cinco mascotas registradas más recientemente</span>
+                </div>
+                <a class="btn btn-soft btn-sm" asp-controller="Mascotas" asp-action="Index" asp-route-orden="recientes">Ver todas</a>
+            </div>
+            @if (Model.Recientes.Count == 0)
+            {
+                <div class="vacio">
+                    <div class="icono"><i class="bi bi-inbox"></i></div>
+                    <h3>Todavía no hay pacientes</h3>
+                    <p>Cuando registres la primera mascota aparecerá aquí.</p>
+                    <a class="btn btn-primary" asp-controller="Mascotas" asp-action="Nuevo"><i class="bi bi-plus-lg"></i> Registrar mascota</a>
+                </div>
+            }
+            @foreach (var m in Model.Recientes)
+            {
+                <a class="lista-fila" asp-controller="Mascotas" asp-action="Ficha" asp-route-id="@m.Id">
+                    <div class="foto foto-xs"><partial name="_FotoMascota" model="m" /></div>
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="titulo">@m.Nombre</div>
+                        <div class="meta">@m.Raza?.Nombre · @m.Propietario?.NombreCompleto</div>
+                    </div>
+                    <span class="chip chip-especie-@((m.Raza?.IdEspecie ?? 0) % 5)">@m.Raza?.Especie?.Nombre</span>
+                </a>
+            }
+        </div>
+    </div>
+</div>

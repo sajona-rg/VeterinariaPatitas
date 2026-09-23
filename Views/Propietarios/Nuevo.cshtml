@@ -1,0 +1,18 @@
+@model Propietario
+@{
+    ViewData["Title"] = "Nuevo propietario";
+    ViewData["Miga"] = "Propietarios";
+    ViewData["Subtitulo"] = "Solo nombre y apellido son obligatorios; el contacto ayuda a ubicarlo después.";
+}
+
+<div class="row">
+    <div class="col-xl-9">
+        <form asp-action="Nuevo" method="post" novalidate>
+            <partial name="_FormPropietario" model="Model" />
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

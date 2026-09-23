@@ -1,0 +1,14 @@
+@model Mascota
+@{
+    ViewData["Title"] = "Nueva mascota";
+    ViewData["Miga"] = "Pacientes";
+    ViewData["Subtitulo"] = "Completa la ficha básica del paciente. Los campos sin asterisco son opcionales.";
+}
+
+<form asp-action="Nuevo" method="post" enctype="multipart/form-data" novalidate>
+    <partial name="_FormMascota" model="Model" />
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

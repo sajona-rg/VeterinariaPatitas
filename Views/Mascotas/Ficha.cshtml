@@ -1,0 +1,93 @@
+@model Mascota
+@{
+    ViewData["Title"] = Model.Nombre;
+    ViewData["Miga"] = "Ficha del paciente";
+    ViewData["Subtitulo"] = $"{Model.Raza?.Especie?.Nombre} · {Model.Raza?.Nombre}";
+    var p = Model.Propietario;
+}
+
+@section Acciones {
+    <a class="btn btn-soft" asp-action="Index"><i class="bi bi-arrow-left"></i> Pacientes</a>
+    <a class="btn btn-ghost-danger" asp-action="Eliminar" asp-route-id="@Model.Id"><i class="bi bi-trash3"></i> Eliminar</a>
+    <a class="btn btn-primary" asp-action="Editar" asp-route-id="@Model.Id"><i class="bi bi-pencil"></i> Editar</a>
+}
+
+<div class="row g-4">
+    <div class="col-md-5 col-lg-4">
+        <div class="panel p-3">
+            <div class="foto foto-lg"><partial name="_FotoMascota" model="Model" /></div>
+        </div>
+    </div>
+
+    <div class="col-md-7 col-lg-8">
+        <div class="panel mb-4">
+            <div class="panel-head"><h2>Datos del paciente</h2></div>
+            <div class="panel-body">
+                <div class="row g-3">
+                    <div class="col-6 col-lg-4">
+                        <div class="ficha-dato">
+                            <div class="etiqueta">Especie</div>
+                            <div class="valor">@Model.Raza?.Especie?.Nombre</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4">
+                        <div class="ficha-dato">
+                            <div class="etiqueta">Raza</div>
+                            <div class="valor">@Model.Raza?.Nombre</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4">
+                        <div class="ficha-dato">
+                            <div class="etiqueta">Edad</div>
+                            <div class="valor @(Model.Edad is null ? "vacio-dato" : "")">@(Model.Edad ?? "Sin registrar")</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4">
+                        <div class="ficha-dato">
+                            <div class="etiqueta">Nacimiento</div>
+                            <div class="valor @(Model.FechaNacimiento is null ? "vacio-dato" : "")">@(Model.FechaNacimiento?.ToString("dd MMM yyyy") ?? "Sin registrar")</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4">
+                        <div class="ficha-dato">
+                            <div class="etiqueta">Peso</div>
+                            <div class="valor @(Model.Peso is null ? "vacio-dato" : "")">@(Model.Peso is null ? "Sin registrar" : $"{Model.Peso:0.00} kg")</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4">
+                        <div class="ficha-dato">
+                            <div class="etiqueta">N.º de ficha</div>
+                            <div class="valor">#@Model.Id.ToString("D4")</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (p is not null)
+        {
+            <div class="panel">
+                <div class="panel-head">
+                    <h2>Propietario</h2>
+                    <a class="btn btn-soft btn-sm" asp-controller="Propietarios" asp-action="Ficha" asp-route-id="@p.Id">Ver ficha</a>
+                </div>
+                <div class="panel-body d-flex flex-wrap gap-4 align-items-start">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="avatar avatar-lg">@p.Iniciales</span>
+                        <div>
+                            <div class="fw-bold fs-5" style="color:var(--pt-bosque)">@p.NombreCompleto</div>
+                            <div class="text-secondary small">Responsable del paciente</div>
+                        </div>
+                    </div>
+                    <ul class="contacto-lista flex-grow-1">
+                        <li><i class="bi bi-telephone"></i> @(string.IsNullOrEmpty(p.Telefono) ? "Sin teléfono" : p.Telefono)</li>
+                        <li><i class="bi bi-envelope"></i>
+                            @if (string.IsNullOrEmpty(p.Email)) { <span>Sin correo</span> } else { <a href="mailto:@p.Email">@p.Email</a> }
+                        </li>
+                        <li><i class="bi bi-geo-alt"></i> @(string.IsNullOrEmpty(p.Direccion) ? "Sin dirección" : p.Direccion)</li>
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</div>

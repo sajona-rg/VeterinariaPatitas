@@ -1,0 +1,15 @@
+@model Mascota
+@{
+    ViewData["Title"] = "Editar mascota";
+    ViewData["Miga"] = "Pacientes";
+    ViewData["Subtitulo"] = "Actualiza los datos o reemplaza la foto. Si no subes una nueva, se conserva la actual.";
+}
+
+<form asp-action="Editar" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" novalidate>
+    <input type="hidden" asp-for="Id" />
+    <partial name="_FormMascota" model="Model" />
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
